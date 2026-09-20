@@ -11,6 +11,7 @@
     --ink: #0a0a09;
     --surface: #151513;
     --lift: #1e1e1b;
+    --field: #0e0e0d;
     --rule: #292822;
     --muted: #837d71;
     --text-2: #a8a296;
@@ -80,6 +81,19 @@
   .note + .note { margin-top: 10px; }
   .note h3 { margin: 0 0 6px; font-size: 15px; }
   .note p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+  .cmd { display: flex; align-items: center; gap: 8px; margin: 12px 0 10px; }
+  .cmd code {
+    flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap;
+    background: var(--field); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .cmd button {
+    flex: none; background: var(--lift); color: var(--text-2);
+    border: 1px solid var(--rule); border-radius: 8px;
+    padding: 10px 14px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .cmd button:hover { border-color: var(--brass); color: var(--text); }
   kbd {
     font: inherit; font-size: .88em; background: var(--lift); border: 1px solid var(--rule);
     border-radius: 5px; padding: 1px 6px; color: var(--text);
@@ -121,7 +135,12 @@
   <h2>Na primeira vez que abrir</h2>
   <div class="note">
     <h3>macOS</h3>
-    <p>O app não é assinado, então o macOS avisa que não conseguiu verificar o desenvolvedor. Clique com o <strong>botão direito</strong> no Kabal Browser dentro da pasta Aplicativos e escolha <strong>Abrir</strong>. Só precisa fazer isso uma vez.</p>
+    <p>Abra o <code>.dmg</code> e arraste o Kabal Browser para a pasta <strong>Aplicativos</strong>. Como o app não vem assinado por um desenvolvedor registrado na Apple, o macOS bloqueia a primeira abertura. Para liberar, abra o <strong>Terminal</strong> e execute:</p>
+    <div class="cmd">
+      <code>xattr -dr com.apple.quarantine "/Applications/Kabal Browser.app"</code>
+      <button type="button">copiar</button>
+    </div>
+    <p>Depois é só abrir normalmente — vale para sempre, não precisa repetir a cada uso. Se preferir não mexer no Terminal: tente abrir o app, feche o aviso, e vá em <strong>Ajustes do Sistema → Privacidade e Segurança</strong>, onde aparece um botão <strong>Abrir Mesmo Assim</strong>.</p>
   </div>
   <div class="note">
     <h3>Windows</h3>
@@ -134,6 +153,20 @@
 
 <script>
 const REPO = 'KabalJunior1/kabal-browser-downloads';
+
+// Copy button on the Terminal command, for people who would rather not retype it.
+for (const btn of document.querySelectorAll('.cmd button')) {
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.previousElementSibling.textContent);
+      const before = btn.textContent;
+      btn.textContent = 'copiado';
+      setTimeout(() => { btn.textContent = before; }, 1500);
+    } catch (e) {
+      // Clipboard blocked; the text stays selectable by hand.
+    }
+  });
+}
 
 // Each installer, with the platform it belongs to and how to find it among the release assets.
 const TARGETS = [
